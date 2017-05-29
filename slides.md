@@ -66,23 +66,18 @@ object SampleMultiJvmNode3 extends App{
 ```
 
 
-#### Running tests
+#### Running tests and specifying JVM arguments
 
-`multi-jvm:test-only sample.Spec`
-
-
-
-#### Changing jvm arguments
-
-``` SampleMultiJvmNode1.opts
--Dakka.remote.port=9991 -Xmx256m    
-```
-
+* `multi-jvm:test-only sample.Spec`
+* `SampleMultiJvmNode1.opts`
+    ```
+    -Dakka.remote.port=9991 -Xmx256m    
+    ```
 
 
 #### Lessons learned
 
-* Every test is executed in its own jvm
+* Every test is executed in its own JVM
 * Useful to spin off **some** tests in parallel
 
 
