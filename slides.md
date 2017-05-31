@@ -71,7 +71,7 @@ object SampleMultiJvmNode3 extends App{
 * `multi-jvm:test-only sample.Spec`
 * `SampleMultiJvmNode1.opts`
     ```
-    -Dakka.remote.port=9991 -Xmx256m    
+-Dakka.remote.port=9991 -Xmx256m    
     ```
 
 
@@ -79,6 +79,7 @@ object SampleMultiJvmNode3 extends App{
 
 * Every test is executed in its own JVM
 * Useful to spin off **some** tests in parallel
+* Useful for testing static/class-loading time code
 
 
 
@@ -96,27 +97,20 @@ libraryDependencies +=
 ```scala
 class DistributedSystemSpec 
       extends MultiNodeSpec(MyMultiNodeConfig) {
-    "An Akka Persited Cluster" must {
+    "An Akka Persisted Cluster" must {
 
     "setup shared journal" in {
       // start the Persistence extension
-      Persistence(system)
-      runOn(controller) {
-        system.actorOf(Props[SharedLeveldbStore], "store")
-      }
-      enterBarrier("started")
-      …
-      enterBarrier("configured")
     }
 
     "join cluster" in within(20.seconds) { … }
+
+    "run test" { … }
+
+    "kill a few nodes, maybe at random" { … }
+
+    "run test again" { … }
 }
-```
-```scala
-class MultiNodeSpecMultiJvmNode1 extends DistributedSystemSpec
-class MultiNodeSpecMultiJvmNode2 extends DistributedSystemSpec
-class MultiNodeSpecMultiJvmNode3 extends DistributedSystemSpec
-class MultiNodeSpecMultiJvmNode4 extends DistributedSystemSpec
 ```
 
 
@@ -138,6 +132,10 @@ object MyMultiNodeConfig extends MultiNodeConfig {
 * `runOn(role: RoleName)`
 * `enterBarrier(name: String)`
 * `awaitAssert { … }`
+
+
+#### Chaos Functions
+
 * `testConductor.exit(first, 0).await`
 * `throttle`, `blackhole`, [etc](http://doc.akka.io/api/akka/current/akka/remote/testconductor/TestConductorExt.html)…
 
@@ -170,50 +168,19 @@ class Spec with BeforeAndAfterAll {
     override def afterAll(): Unit = multiNodeSpecAfterAll()
 }
     ```
-* All specs run seperately
+* All specs run seperately, they don't need to be the same spec!
+* Writing these tests is actually fun
 
 
 
 
 ### Discussion
 
-* Docker + blockage
-
+* Docker + blockade
+* Run Gatling in one node
 
 
 ### Conclusion
 
 * Orchestration can be made easier
 * Writing good tests is still hard
-
-<!--
-# Multi-JVM
-    * Part SBT
-    * Part Akka Toolkit
-* Intro to sbt-multi-jvm
-    * Add plugin
-    * src/multi-jvm/...
-    * SampleMultiJvmNode2
-    * multi-jvm:run runs all nodes
-    * Tests
-        * Create node SpecMultiJvmNode1
-        * Multi-jvm:test-only sample.Spec
-            * IT tests usually take a long time so useful to just run one at a time
-        * 
-* Useful functions
-* Akka
-    * Adds controls for testing actors ("com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion)
-        * Start/stop api
-        * Barriers
-        * runOn - if statement
-        * 
-    * Custom
-        * Join - one by one
-def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
-      cluster join node(to).address
-    }
-    enterBarrier(from.name + "-joined")
-  }
-            * 
--->
