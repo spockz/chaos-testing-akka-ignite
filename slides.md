@@ -1,6 +1,13 @@
 ## Chaos-Testing Akka Applications with Multi JVM tests
 
 
+### Who am I
+
+* Functional Programming Evangelist
+* API Platform Engineer @ ING
+
+
+
 ### Distributed applications are hard
 
 * To write
